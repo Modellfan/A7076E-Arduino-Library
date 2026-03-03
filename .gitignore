@@ -3,3 +3,10 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+
+log/
+archives/
+!archives/.gitkeep
+!archives/stages/.gitkeep
+__pycache__/
+*.pyc

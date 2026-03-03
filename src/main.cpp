@@ -1,18 +1,37 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+namespace {
+constexpr unsigned long kBaudRate = 115200;
+constexpr size_t kMaxLineLen = 64;
+char gLineBuffer[kMaxLineLen];
+size_t gLineLen = 0;
+}
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  Serial.begin(kBaudRate);
+  delay(200);
+  Serial.println("READY");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  while (Serial.available() > 0) {
+    const char c = static_cast<char>(Serial.read());
+    if (c == '\r' || c == '\n') {
+      if (gLineLen == 0) {
+        continue;
+      }
+      gLineBuffer[gLineLen] = '\0';
+      if (strcmp(gLineBuffer, "PING") == 0) {
+        Serial.println("PONG");
+      } else {
+        Serial.print("UNKNOWN:");
+        Serial.println(gLineBuffer);
+      }
+      gLineLen = 0;
+      continue;
+    }
+    if (gLineLen < (kMaxLineLen - 1)) {
+      gLineBuffer[gLineLen++] = c;
+    }
+  }
 }
