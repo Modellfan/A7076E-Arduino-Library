@@ -110,3 +110,95 @@ This file is the permanent record for development work in this project.
 ### Notes
 - Initial rebuild attempt failed with `SPI.h` missing; resolved by adding framework SPI include path in shared `build_flags`.
 
+
+## 2026-03-03 23:12:31 +01:00 - Remove Ping Requirement from Agent Workflow
+
+### Planned Steps
+- Create a stage snapshot for AGENTS.md and IMPLEMENTATION_LOG.md before editing.
+- Remove ping-specific mandatory step and command from AGENTS.md so workflow stays generic.
+- Validate the updated document text and record results.
+
+### Changes Made
+- `AGENTS.md`: removed the ping-specific mandatory workflow step.
+- `AGENTS.md`: removed the ping command from `Required Commands` and renumbered remaining sections.
+
+### Automated Tests Run
+- `powershell -ExecutionPolicy Bypass -Command "& { .\tools\stage_archive.ps1 -Action snapshot -Label 'before_remove_ping_agent_rule' -Paths @('AGENTS.md','IMPLEMENTATION_LOG.md') }"`: PASS
+- `rg -n "serial ping|PING|Serial ping setup test" AGENTS.md`: PASS (no matches found)
+
+### Result
+- stage_id: `20260303_231250_before_remove_ping_agent_rule`
+- stage_path: `archives/stages/20260303_231250_before_remove_ping_agent_rule`
+- ping_requirement_in_agents: false
+
+### Artifacts
+- [agent_workflow](AGENTS.md)
+- [stage_manifest](archives/stages/20260303_231250_before_remove_ping_agent_rule/manifest.json)
+
+### Notes
+- No code/runtime behavior was changed; this task is documentation policy cleanup only.
+
+
+## 2026-03-03 23:13:58 +01:00 - Minimize PlatformIO Configuration
+
+### Planned Steps
+- Create a stage snapshot for platformio.ini and IMPLEMENTATION_LOG.md before editing.
+- Replace current platformio.ini with a bare-minimum ESP32 release environment on COM12 and remove unused libraries.
+- Run a build validation and record pass/fail.
+
+### Changes Made
+- `platformio.ini`: replaced with a bare-minimum configuration for one `release` ESP32 Arduino environment on `COM12`.
+- `platformio.ini`: removed all extra environments, library dependencies, source filters, and non-essential build/upload options.
+
+### Automated Tests Run
+- `powershell -ExecutionPolicy Bypass -Command "& { .\tools\stage_archive.ps1 -Action snapshot -Label 'before_min_platformio_ini' -Paths @('platformio.ini','IMPLEMENTATION_LOG.md') }"`: PASS
+- `& "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe" run -e release`: PASS
+
+### Result
+- stage_id: `20260303_231404_before_min_platformio_ini`
+- stage_path: `archives/stages/20260303_231404_before_min_platformio_ini`
+- platformio_ini_profile: `bare_minimum`
+- release_build: PASS
+
+### Artifacts
+- [platformio_ini](platformio.ini)
+- [stage_manifest](archives/stages/20260303_231404_before_min_platformio_ini/manifest.json)
+
+### Notes
+- No additional runtime/upload test executed because the request was limited to configuration cleanup; build validation passed.
+
+
+## 2026-03-03 23:15:58 +01:00 - Generate AT Command Checklist from A76XX Manual
+
+### Planned Steps
+- Create a stage snapshot for README.md and IMPLEMENTATION_LOG.md before edits.
+- Parse documentation/datasheet/A76XX_Series_AT_Command_Manual_V1.09.pdf and extract AT command identifiers.
+- Write a structured checkbox checklist into README.md and validate output.
+
+### Changes Made
+- `README.md`: replaced placeholder content with a structured AT command implementation checklist generated from `A76XX_Series_AT_Command_Manual_V1.09.pdf`.
+- `README.md`: organized commands by manual section and added markdown checkboxes for each command.
+
+### Automated Tests Run
+- `powershell -ExecutionPolicy Bypass -Command "& { .\tools\stage_archive.ps1 -Action snapshot -Label 'before_readme_at_checklist' -Paths @('README.md','IMPLEMENTATION_LOG.md') }"`: PASS
+- `python script (PdfReader parse + regex extraction)` before dependency install: FAIL (`ModuleNotFoundError: No module named 'pypdf'`)
+- `python -m pip install pypdf`: PASS
+- `python script to parse PDF text and inspect command extraction`: PASS
+- `python script to parse PDF outline, canonicalize command tokens, and write README.md`: PASS
+- `rg -n "^- \[ \]" README.md | Measure-Object`: PASS (`396` checklist items)
+
+### Result
+- stage_id: `20260303_231609_before_readme_at_checklist`
+- stage_path: `archives/stages/20260303_231609_before_readme_at_checklist`
+- sections_listed: `34`
+- commands_listed: `396`
+- unique_commands: `396`
+
+### Artifacts
+- [readme_checklist](README.md)
+- [source_manual](documentation/datasheet/A76XX_Series_AT_Command_Manual_V1.09.pdf)
+- [stage_manifest](archives/stages/20260303_231609_before_readme_at_checklist/manifest.json)
+
+### Notes
+- Command extraction was based on PDF outline section entries with token canonicalization against full-text command matches to reduce truncation artifacts in headings.
+

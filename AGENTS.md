@@ -21,12 +21,11 @@ Required flow:
 
 For every code change, follow this sequence. A change is not complete unless all steps pass.
 
-1. Run a simple serial ping setup test (`PING` -> `PONG`) to verify serial path and device responsiveness.
-2. Create an archive snapshot of the files being changed.
-3. Write or update an automated test case that verifies the changed behavior.
-4. Run automated tests locally and confirm they pass.
-5. Build and upload firmware to the target device on `COM12`.
-6. Start serial test console validation that:
+1. Create an archive snapshot of the files being changed.
+2. Write or update an automated test case that verifies the changed behavior.
+3. Run automated tests locally and confirm they pass.
+4. Build and upload firmware to the target device on `COM12`.
+5. Start serial test console validation that:
    - Resets the device,
    - Captures serial output to a log file,
    - Analyzes the log,
@@ -67,30 +66,27 @@ Git tracking rule:
 
 ## Required Commands
 
-### 1) Serial ping setup test
-- `python tools/serial_ping.py --port COM12 --baud 115200 --timeout 8`
-
-### 2) Archive snapshot
+### 1) Archive snapshot
 - `powershell -ExecutionPolicy Bypass -File tools/stage_archive.ps1 -Action snapshot -Label "<change_label>" -Paths <path1>,<path2>`
 
 If `-Paths` parsing fails in shell:
 - `powershell -ExecutionPolicy Bypass -Command "& { .\tools\stage_archive.ps1 -Action snapshot -Label 'before_<change_name>' -Paths @('path1','path2') }"`
 
-### 3) List snapshots
+### 2) List snapshots
 - `powershell -ExecutionPolicy Bypass -File tools/stage_archive.ps1 -Action list`
 
-### 4) Restore snapshot
+### 3) Restore snapshot
 - `powershell -ExecutionPolicy Bypass -File tools/stage_archive.ps1 -Action restore -Stage "<stage_id>"`
 - Dry run: `powershell -ExecutionPolicy Bypass -File tools/stage_archive.ps1 -Action restore -Stage "<stage_id>" -DryRun`
 
-### 5) Automated test case + run
+### 4) Automated test case + run
 - Add/update tests under `test/`.
 - Example: `pio test -e release`
 
-### 6) Build and upload
+### 5) Build and upload
 - `pio run -e release -t upload --upload-port COM12`
 
-### 7) Serial test console execution
+### 6) Serial test console execution
 - `python tools/serial_log.py --port COM12 --baud 115200 --max-seconds 60`
 
 ## Completion Criteria
